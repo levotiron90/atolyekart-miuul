@@ -1,0 +1,97 @@
+// AtölyeKart demo ürün/varyant verisi. Düz global sabit — ES module/import yok,
+// index.html bu dosyayı Babel script'inden önce <script src> ile yükler.
+const CARD_DATA = [
+  {
+    name: "Soğuk Proses Kalıp Sabun",
+    imageUrl: "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?auto=format&fit=crop&w=900&q=80",
+    alt: "Lavantalı, el yapımı soğuk proses sabun barları",
+    variants: [
+      {
+        name: "Lavanta & Pembe Kil",
+        subtitle: "Yatıştırıcı & Hassas Ciltler",
+        description: "Fransız pembe kili ile cildi nazikçe arındırırken, lavanta uçucu yağı ile kızarıklıkları ve stresi yatıştırır. Günlük yüz ve vücut temizliği için idealdir.",
+        price: "₺150",
+        priceNote: "örnek fiyat",
+        tags: ["Lavanta", "Pembe Kil", "Hassas Cilt"],
+      },
+      {
+        name: "Aktif Karbon & Çay Ağacı",
+        subtitle: "Detoks & Gözenek Arındırıcı",
+        description: "Aktif hindistan cevizi kömürü ile tıkalı gözenekleri derinlemesine temizler. Çay ağacı yağı sayesinde anti-bakteriyel özellik gösterir; özellikle yağlı ve akneye meyilli ciltler için tasarlanmıştır.",
+        price: "₺165",
+        priceNote: "örnek fiyat",
+        tags: ["Aktif Karbon", "Çay Ağacı", "Detoks"],
+      },
+      {
+        name: "Yulaf & Ham Bal",
+        subtitle: "Hafif Peeling & Kuru Ciltler",
+        description: "İçeriğindeki öğütülmüş yulaf taneleriyle ölü deriyi nazikçe soyar. Ham bal ve zeytinyağı bazı sayesinde cildi kurumaktan korur, yoğun nem verir.",
+        price: "₺160",
+        priceNote: "örnek fiyat",
+        tags: ["Yulaf", "Ham Bal", "Peeling"],
+      },
+    ],
+  },
+  {
+    name: "Katı Şampuan Barı",
+    imageUrl: "https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?auto=format&fit=crop&w=900&q=80",
+    alt: "El yapımı katı şampuan barları",
+    variants: [
+      {
+        name: "Argan & Keratin",
+        subtitle: "Onarıcı & Kuru Saçlar",
+        description: "Argan yağı ve bitkisel keratin proteini ile zenginleştirilmiştir. Isıl işlem görmüş veya boyalı saç tellerin bağlarını güçlendirir, kabarmayı önler.",
+        price: "₺135",
+        priceNote: "örnek fiyat",
+        tags: ["Argan Yağı", "Keratin", "Onarıcı"],
+      },
+      {
+        name: "Biberiye & Isırgan Otu",
+        subtitle: "Dökülme Karşıtı & Hacim",
+        description: "Biberiye yağı kan dolaşımını hızlandırarak saç köklerini besler, ısırgan otu ekstraktı ise saçlara hacim kazandırır ve dökülmeyi azaltmaya yardımcı olur.",
+        price: "₺125",
+        priceNote: "örnek fiyat",
+        tags: ["Biberiye", "Isırgan Otu", "Dökülme Karşıtı"],
+      },
+      {
+        name: "Yeşil Çay & Narenciye",
+        subtitle: "Yağ Dengeleyici & Arındırıcı",
+        description: "Yeşil çay tozu ve tatlı portakal/limon kabuğu yağları ile saç derisindeki fazla sebumu dengeler. Saçta gün boyu süren bir ferahlık ve hafiflik bırakır.",
+        price: "₺120",
+        priceNote: "örnek fiyat",
+        tags: ["Yeşil Çay", "Narenciye", "Yağ Dengeleyici"],
+      },
+    ],
+  },
+  {
+    name: "Aromaterapik Duş Tableti",
+    imageUrl: "https://images.unsplash.com/photo-1690583368241-8b8cd3d3f9af?auto=format&fit=crop&w=900&q=80",
+    alt: "Köpüklü suda eriyen aromaterapik duş tableti",
+    variants: [
+      {
+        name: "Okaliptüs & Nane",
+        subtitle: "Nefes Açıcı & Canlandırıcı",
+        description: "Yoğun mentol kristalleri ve okaliptüs yağı içerir. Sıcak duş buharıyla birleştiğinde tıkalı solunum yollarını açar, sabahları zihni anında uyandırır.",
+        price: "₺90",
+        priceNote: "örnek fiyat",
+        tags: ["Okaliptüs", "Nane", "Canlandırıcı"],
+      },
+      {
+        name: "Lavanta & Ylang Ylang",
+        subtitle: "Gece / Stres Giderici",
+        description: "Günün yorgunluğunu atmak ve uykuya geçişi kolaylaştırmak için tasarlanmıştır. Akşam duşunda zihni sakinleştiren tatlı ve çiçeksi bir buhar yayar.",
+        price: "₺95",
+        priceNote: "örnek fiyat",
+        tags: ["Lavanta", "Ylang Ylang", "Stres Giderici"],
+      },
+      {
+        name: "Tatlı Portakal & Bergamot",
+        subtitle: "Mod Yükseltici & Enerji",
+        description: "Narenciye aromalarıyla neşe ve enerji veren bir atmosfer sunar. Güne pozitif başlama ritüelleri için ideal bir motivasyon kapsülüdür.",
+        price: "₺90",
+        priceNote: "örnek fiyat",
+        tags: ["Tatlı Portakal", "Bergamot", "Enerji"],
+      },
+    ],
+  },
+];
