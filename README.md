@@ -17,16 +17,17 @@ Doğal ve sürdürülebilir el yapımı kişisel bakım ürünleri satan bir at�
 
 ## Teknoloji
 
-Build aracı yok — `npm`, `node_modules`, derleme adımı bulunmuyor. Tek bir `index.html` dosyası, React ve Babel Standalone'u doğrudan CDN üzerinden yükleyip tarayıcıda JSX'i anında derler.
+Build aracı yok — `npm`, `node_modules`, derleme adımı bulunmuyor. `react.html` dosyası, React ve Babel Standalone'u doğrudan CDN üzerinden yükleyip tarayıcıda JSX'i anında derler.
 
 ## Proje Yapısı
 
 ```
-index.html          Tüm bileşenler, stiller ve uygulama mantığı
-src/data/card.js     Ürün/varyant verisi (isim, açıklama, fiyat, etiketler)
-src/data/stock.js    Stok durumu (productId → true/false)
-CLAUDE.md            Atölye ve ürün bağlamı
-.claude/skills/      Proje kuralları (bileşen ve webhook sözleşmesi)
+index.html           react.html'e otomatik yönlendiren basit giriş sayfası
+react.html            Asıl uygulama — tüm bileşenler, stiller ve uygulama mantığı
+src/data/card.js      Ürün/varyant verisi (isim, açıklama, fiyat, etiketler)
+src/data/stock.js     Stok durumu (productId → true/false)
+CLAUDE.md             Atölye ve ürün bağlamı
+.claude/skills/       Proje kuralları (bileşen ve webhook sözleşmesi)
 ```
 
 ## Yerelde Çalıştırma
@@ -37,7 +38,7 @@ Build adımı gerekmediği için herhangi bir statik dosya sunucusu yeterli:
 python -m http.server 8765
 ```
 
-Sonra `http://localhost:8765/index.html` adresini açın. (`fetch` kullanılmadığından `file://` ile doğrudan açmak da çalışır.)
+Sonra `http://localhost:8765/index.html` adresini açın — otomatik olarak `react.html`'e yönlenir. (`fetch` kullanılmadığından `file://` ile doğrudan açmak da çalışır.)
 
 ## Stok Durumunu Güncelleme
 

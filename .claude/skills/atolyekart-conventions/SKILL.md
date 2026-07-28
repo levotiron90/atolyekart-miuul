@@ -6,26 +6,27 @@ description: Use when adding, editing, or reviewing React components, product/va
 # AtölyeKart Proje Kuralları
 
 ## Genel Bakış
-AtölyeKart, build aracı olmadan (npm/node_modules yok) tek bir `index.html` içinde CDN React + Babel Standalone ile çalışan bir ürün kataloğudur. Bu skill, yeni bileşen eklerken ve sipariş/stok-bildirimi webhook'larını bağlarken uyulması gereken kuralları tanımlar.
+AtölyeKart, build aracı olmadan (npm/node_modules yok) çalışan bir ürün kataloğudur. `index.html`, tek satırlık bir `<meta http-equiv="refresh">` yönlendirmesinden ibarettir — asıl uygulama **`react.html`** dosyasında, CDN React + Babel Standalone ile yazılıdır. Bu skill, yeni bileşen eklerken ve sipariş/stok-bildirimi webhook'larını bağlarken uyulması gereken kuralları tanımlar.
 
 ## Bileşen Kuralları
 
-1. **Tek dosya**: Her bileşen `index.html` içindeki tek `<script type="text/babel">` bloğunda tanımlanır. Bileşen başına ayrı `.jsx`/`.css`/`index.js` dosyaları açılmaz — stil de aynı dosyadaki `<style>` bloğunda kalır.
+0. **Dosya ayrımı**: `index.html` sadece `react.html`'e yönlendiren statik bir giriş sayfasıdır, içine bileşen/mantık eklenmez. Tüm gerçek geliştirme **`react.html`** üzerinde yapılır.
+1. **Tek dosya**: Her bileşen `react.html` içindeki tek `<script type="text/babel">` bloğunda tanımlanır. Bileşen başına ayrı `.jsx`/`.css`/`index.js` dosyaları açılmaz — stil de aynı dosyadaki `<style>` bloğunda kalır.
 2. **Fonksiyon bileşeni**: Tüm bileşenler fonksiyon bileşenidir (`function Foo() {...}`). Class component kullanılmaz. State için `React.useState`/`useEffect` kullanılır.
 3. **Demo veri konumu**: Ürün/varyant verisi `src/data/card.js` dosyasında, düz bir `<script>` ile (ES module/import olmadan) tanımlanır ve global bir sabit olarak dışa verilir:
    ```js
    // src/data/card.js
    const CARD_DATA = [ /* ürün + variants dizisi */ ];
    ```
-   `index.html`, bu dosyayı Babel script'inden **önce** `<script src="src/data/card.js"></script>` ile yükler; React kodu veriyi `fetch` ile değil doğrudan `CARD_DATA` global'inden okur.
+   `react.html`, bu dosyayı Babel script'inden **önce** `<script src="src/data/card.js"></script>` ile yükler; React kodu veriyi `fetch` ile değil doğrudan `CARD_DATA` global'inden okur.
 4. **Stok durumu**: Ürün/varyant verisinde (`card.js`) tutulmaz — ayrı bir `src/data/stock.js` dosyasında, `productId` → `true/false` eşlemesi olarak tutulur:
    ```js
    // src/data/stock.js
    const STOCK = { "<ürün-slug>_<varyant-slug>": true /* veya false */, ... };
    ```
-   `index.html`, bu dosyayı `card.js`'ten hemen sonra, Babel script'inden **önce** `<script src="src/data/stock.js"></script>` ile yükler. `ProductCard` stok durumunu `STOCK[productId] !== false` ile okur (anahtar eksikse varsayılan olarak stokta kabul edilir). Atölye sahibi bir ürünün stok durumunu değiştirmek için sadece bu dosyadaki ilgili satırı `true`/`false` yapar — başka hiçbir dosyaya dokunmaz.
+   `react.html`, bu dosyayı `card.js`'ten hemen sonra, Babel script'inden **önce** `<script src="src/data/stock.js"></script>` ile yükler. `ProductCard` stok durumunu `STOCK[productId] !== false` ile okur (anahtar eksikse varsayılan olarak stokta kabul edilir). Atölye sahibi bir ürünün stok durumunu değiştirmek için sadece bu dosyadaki ilgili satırı `true`/`false` yapar — başka hiçbir dosyaya dokunmaz.
    `inStock: true` → kartta "Sipariş Ver" butonu/formu gösterilir; `inStock: false` → görselde "Tükendi" rozeti + "Stok Bildirimi İste" butonu/formu gösterilir. İki eylem asla aynı anda gösterilmez.
-5. **Webhook gönderim yardımcıları**: `WEBHOOK_URL` sabiti, `slugify`/`getProductId` ve `sendToWebhook` yardımcı fonksiyonları `index.html`'in Babel script bloğunun başında tanımlıdır ve tüm form bileşenleri bunları kullanır. `sendToWebhook`, isteği `mode: "no-cors"` + `text/plain` içerik tipiyle gönderir (çoğu webhook hedefi tarayıcıdan gelen `application/json` isteklerinde CORS preflight'ı reddeder — bkz. Yaygın Hatalar). `fetch` başarısız olsa bile hatayı yutar ve payload'ı konsola loglar — çağıran kod her zaman "gönderildi" varsayıp onay mesajını gösterebilir.
+5. **Webhook gönderim yardımcıları**: `WEBHOOK_URL` sabiti, `slugify`/`getProductId` ve `sendToWebhook` yardımcı fonksiyonları `react.html`'in Babel script bloğunun başında tanımlıdır ve tüm form bileşenleri bunları kullanır. `sendToWebhook`, isteği `mode: "no-cors"` + `text/plain` içerik tipiyle gönderir (çoğu webhook hedefi tarayıcıdan gelen `application/json` isteklerinde CORS preflight'ı reddeder — bkz. Yaygın Hatalar). `fetch` başarısız olsa bile hatayı yutar ve payload'ı konsola loglar — çağıran kod her zaman "gönderildi" varsayıp onay mesajını gösterebilir.
 
 ## Webhook Veri Sözleşmesi
 
@@ -67,7 +68,8 @@ Alanlar: `event`, `name`, `productId`, `productName`, `email`, `source` (sipari�
 
 | Konu | Kural |
 |---|---|
-| Bileşen dosyası | Hepsi `index.html` içinde, tek `<script type="text/babel">` |
+| Ana uygulama dosyası | `react.html` (index.html sadece yönlendirme) |
+| Bileşen dosyası | Hepsi `react.html` içinde, tek `<script type="text/babel">` |
 | Bileşen tipi | Sadece fonksiyon bileşeni |
 | Veri konumu | `src/data/card.js` → global `CARD_DATA` |
 | Stok konumu | `src/data/stock.js` → global `STOCK` (`productId` → `true/false`) |
@@ -82,7 +84,8 @@ Alanlar: `event`, `name`, `productId`, `productName`, `email`, `source` (sipari�
 | `source` değeri | Katalog sayfası için sabit: `"atolyekart-web"` |
 
 ## Yaygın Hatalar
-- Yeni bir bileşeni ayrı `.jsx` dosyasına taşımak → **yapma**, `index.html` içinde kalmalı.
+- Yeni bir bileşeni ayrı `.jsx` dosyasına taşımak → **yapma**, `react.html` içinde kalmalı.
+- `index.html`'e bileşen/mantık eklemek → **yapma**, o dosya sadece `react.html`'e yönlendirir.
 - Payload'ı `customer`/`items` gibi iç içe (nested) nesnelerle göndermek → **yanlış**, tüm alanlar payload'ın kök seviyesinde düz olmalı.
 - Stok bildirimi payload'ına `phone` veya `quantity` eklemek → **yanlış**, bu alanlar sadece sipariş payload'ındadır.
 - `products.json`'a geri dönmek veya yeni veri dosyasını `.json` yapmak → **yapma**, veri `src/data/card.js` içinde düz JS sabiti olarak kalmalı (fetch değil, doğrudan script include).
