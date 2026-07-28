@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lather & Lull</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --text: #2e2a25;
+    --muted: #6b6157;
+    --accent: #7a8c6f;
+    --accent-soft: #e7ecdf;
+    --border: #e8e1d6;
+    --price-badge: #b98a4e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1a17;
+      --surface: #262320;
+      --text: #efe9e0;
+      --muted: #a89e91;
+      --accent: #9db28e;
+      --accent-soft: #333a2d;
+      --border: #3a352e;
+      --price-badge: #d6a668;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  header {
+    text-align: center;
+    padding: 4rem 1.5rem 3rem;
+  }
+  header h1 {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.02em;
+  }
+  header p {
+    color: var(--muted);
+    max-width: 40em;
+    margin: 0 auto;
+    font-size: 1.05rem;
+  }
+  main {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+  .category-label {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    font-weight: 600;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.75rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .card h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+  .card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    flex-grow: 1;
+  }
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .price {
+    background: var(--accent-soft);
+    color: var(--price-badge);
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+  }
+  .price-note {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  footer {
+    text-align: center;
+    padding: 2rem 1.5rem 3rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Lather & Lull</h1>
+  <p>Doğaya sadık, cildinize nazik. Plastiksiz ve kimyasalsız el yapımı bakım ürünleriyle günlük rutininizi sakin bir ritüele dönüştürüyoruz.</p>
+</header>
+
+<main>
+  <div class="category-label">Doğal Bakım Ürünleri</div>
+  <div class="grid">
+
+    <div class="card">
+      <h2>Soğuk Proses Kalıp Sabun</h2>
+      <p>Zeytinyağı ve hindistan cevizi yağı gibi doğal sabit yağlarla geleneksel yöntemle üretilir, 4-6 hafta kürlenir. Lavanta, aktif karbon veya pembe kil gibi doğal katkılarla zenginleştirilir.</p>
+      <div class="price-row">
+        <span class="price">₺150</span>
+        <span class="price-note">örnek fiyat</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Katı Şampuan Barı</h2>
+      <p>Susuz ve plastiksiz formüle edilmiş konsantre şampuan. Bitkisel surfaktanlar, argan/jojoba yağı ve keratin ile saçınızı besler; kürlenme beklemeden kullanıma hazırdır.</p>
+      <div class="price-row">
+        <span class="price">₺120</span>
+        <span class="price-note">örnek fiyat</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Aromaterapik Duş Tableti</h2>
+      <p>Okaliptüs, mentol ve nane yağlarıyla hazırlanan duş tableti, sıcak suyla temas ettiğinde eriyerek duşunuzu bir buhar terapisi seansına dönüştürür.</p>
+      <div class="price-row">
+        <span class="price">₺90</span>
+        <span class="price-note">örnek fiyat</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 Lather & Lull — Doğal & Sürdürülebilir Bakım
+</footer>
+
+</body>
+</html>
