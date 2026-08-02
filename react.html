@@ -469,10 +469,6 @@
 <script type="text/babel" data-type="module">
 const { useState, useEffect } = React;
 
-// Demo modu: gerçek backend bağlanana kadar webhook isteği bu adrese denenir;
-// başarısız olsa da (placeholder olduğu için beklenir) kullanıcıya onay gösterilir.
-const WEBHOOK_URL = "https://webhook.site/f6c51a2b-1083-4b2d-8398-35851cbb59a1";
-
 function slugify(text) {
   const trMap = { ç: "c", ğ: "g", ı: "i", ö: "o", ş: "s", ü: "u", İ: "i" };
   return text
@@ -501,19 +497,17 @@ const COUNTRY_CODES = [
 
 async function sendToWebhook(payload) {
   try {
-    // mode: "no-cors" + text/plain: çoğu webhook hedefi (webhook.site dahil,
-    // özel CORS başlığı eklenmediği sürece) tarayıcıdan gelen application/json
-    // isteklerinde CORS preflight'ı reddeder. no-cors ile istek "basit istek"
-    // sayılır, preflight'a takılmadan gönderilir (yanıt okunamaz ama zaten
-    // ihtiyacımız yok — bkz. atolyekart-conventions skill).
-    await fetch(WEBHOOK_URL, {
+    // Gerçek webhook adresi tarayıcıya hiç gönderilmez: istek aynı origin'deki
+    // /api/webhook serverless fonksiyonuna gider, o da process.env.WEBHOOK_URL'i
+    // sunucu tarafında okuyup hedefe iletir. Aynı origin olduğu için CORS sorunu
+    // yaşanmaz, normal application/json isteği yeterlidir.
+    await fetch("/api/webhook", {
       method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=UTF-8" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
   } catch (err) {
-    console.warn("Webhook'a ulaşılamadı (demo modu, backend henüz bağlı değil):", err);
+    console.warn("Webhook'a ulaşılamadı:", err);
   }
   console.log("Webhook payload:", payload);
 }
