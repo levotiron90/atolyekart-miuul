@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const requestLog = new Map();
@@ -33,6 +35,19 @@ module.exports = async (req, res) => {
   if (isRateLimited(ip)) {
     res.setHeader("Retry-After", "60");
     return res.status(429).json({ error: "Too Many Requests" });
+  }
+
+  const authHeader = req.headers["authorization"] || "";
+  const [scheme, token] = authHeader.split(" ");
+
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const webhookUrl = process.env.WEBHOOK_URL;
