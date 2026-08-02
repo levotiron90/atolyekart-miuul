@@ -531,11 +531,34 @@ async function sendToWebhook(payload) {
     // /api/webhook serverless fonksiyonuna gider, o da process.env.WEBHOOK_URL'i
     // sunucu tarafında okuyup hedefe iletir. Aynı origin olduğu için CORS sorunu
     // yaşanmaz, normal application/json isteği yeterlidir.
-    await fetch("/api/webhook", {
+    // /api/webhook ayrıca Authorization: Bearer <JWT> header'ını zorunlu kılar
+    // (anonim, oturum bazlı token — bkz. fetchAuthToken). Token süresi dolmuşsa
+    // (401) yeni bir token alınıp istek bir kez daha denenir.
+    let token = localStorage.getItem("atolyekart_jwt");
+    let response = await fetch("/api/webhook", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token || ""}`,
+      },
       body: JSON.stringify(payload),
     });
+
+    if (response.status === 401) {
+      token = await fetchAuthToken();
+      response = await fetch("/api/webhook", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    if (!response.ok) {
+      console.warn("Webhook isteği başarısız:", response.status);
+    }
   } catch (err) {
     console.warn("Webhook'a ulaşılamadı:", err);
   }
