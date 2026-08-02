@@ -1,12 +1,12 @@
-# Anonim JWT Koruması — Tasarım
+# Anonim JWT Koruması ve Rate Limiting — Tasarım
 
 ## Amaç
-`react.html` üzerinden gönderilen "Sipariş Ver" ve "Stok Bildirimi İste" istekleri şu an doğrudan `/api/webhook`'a, herhangi bir kimlik doğrulama olmadan ulaşıyor. Login ekranı eklemeden, `/api/webhook`'u yalnızca bu sitenin kendi ön yüzünden gelen isteklere açık hale getirmek için anonim, oturum bazlı bir JWT katmanı ekleniyor.
+`react.html` üzerinden gönderilen "Sipariş Ver" ve "Stok Bildirimi İste" istekleri şu an doğrudan `/api/webhook`'a, herhangi bir kimlik doğrulama veya istek sınırlaması olmadan ulaşıyor. Login ekranı eklemeden, `/api/webhook`'u (a) yalnızca bu sitenin kendi ön yüzünden gelen isteklere açan anonim bir JWT katmanı ve (b) IP başına dakikada 10 isteklik bir rate limit ile koruma altına alıyoruz.
 
 ## Kapsam Dışı
 - Kullanıcı hesabı, login/şifre akışı — bilinçli olarak eklenmiyor.
-- Rate limiting / brute-force koruması — ayrı bir konu, bu spec'in kapsamında değil.
 - Token'ın sekme kapatılınca silinmesi veya "logout" — anonim oturum olduğu için gerekmiyor.
+- Dağıtık/kesin rate limiting (Redis vb.) — bkz. "Rate Limiting" bölümündeki plan tercihi.
 
 ## Yeni Bağımlılık
 Proje şu ana kadar build aracısız/npm bağımlılıksız çalışıyordu (bkz. `atolyekart-conventions` skill). `jsonwebtoken` kütüphanesini kullanma kararıyla birlikte kök dizine bir `package.json` eklenir:
@@ -43,6 +43,21 @@ Proje şu ana kadar build aracısız/npm bağımlılıksız çalışıyordu (bkz
 - `jwt.verify(token, process.env.JWT_SECRET)` ile doğrulanır.
 - Header yoksa / format yanlışsa / doğrulama başarısızsa (süresi dolmuş dahil): `401 { error: "Unauthorized" }` döner, mevcut webhook forward mantığına hiç girilmez.
 - Doğrulama başarılıysa: mevcut davranış (payload'ı `process.env.WEBHOOK_URL`'e POST etme) birebir aynı kalır.
+- İşlem sırası: önce rate limit kontrolü (aşağıya bkz.), sonra JWT doğrulaması. Böylece limiti aşan istemci, JWT geçerli olsa da olmasa da `429` alır — bu da doğrulamasız spam/flood denemelerini de en ucuz noktada durdurur.
+
+## Rate Limiting
+**Plan kısıtı:** Proje Vercel **Hobby** planında; `vercel firewall` (WAF custom rules / native rate limiting) Hobby'de kullanılamıyor (`vercel firewall overview` → `IP Bypass is unavailable for this plan`). Bu yüzden limit, edge/firewall seviyesinde değil, `api/webhook.js` fonksiyonunun kendi kodunda uygulanıyor.
+
+**Yöntem — fonksiyon içi bellek sayacı:**
+- `api/webhook.js` içinde modül seviyesinde bir `Map` tutulur: `ip → { count, windowStart }`.
+- İstemci IP'si `x-forwarded-for` header'ının ilk değerinden okunur (Vercel bunu proxy arkasında otomatik set eder), yoksa `req.socket.remoteAddress`'e düşülür.
+- Sabit pencere (fixed window) algoritması: pencere 60 saniye, limit 10 istek.
+  - Kayıt yoksa veya pencere süresi (60sn) dolmuşsa: sayaç `{ count: 1, windowStart: now }` olarak sıfırlanır, istek geçer.
+  - Pencere içindeyse: `count` artırılır; `count > 10` ise istek `429 Too Many Requests` (+ `Retry-After: 60` header'ı) ile reddedilir.
+- **Bilinen kısıt (bilinçli tercih):** Bu sayaç fonksiyonun çalıştığı tek bir instance'a ait bellekte tutulur. Soğuk başlangıçta (cold start) sıfırlanır; birden fazla instance eşzamanlı çalışırsa limit teorik olarak biraz aşılabilir. Redis gibi paylaşımlı bir depoya göre daha az kesin, ama hiçbir yeni bağımlılık/servis gerektirmez ve bu ölçekteki bir siteyi kaba spam/bot yüklenmesinden korumak için yeterlidir.
+
+## `react.html` Değişiklikleri — Rate Limiting
+Yok. Rate limit tamamen sunucu tarafında (`api/webhook.js`) uygulanır; istemci kodu değişmez. `sendToWebhook`'un mevcut hata yutma davranışı, olası bir `429` yanıtını da (diğer hatalar gibi) sessizce loglar — kullanıcıya yine de "gönderildi" onayı gösterilir (mevcut UX bozulmaz).
 
 ## `react.html` Değişiklikleri
 1. **Token edinme:** `App()` bileşenine mount-time bir `useEffect` eklenir. `localStorage.getItem("atolyekart_jwt")` kontrol edilir; yoksa `GET /api/token` çağrılıp sonuç `localStorage.setItem("atolyekart_jwt", token)` ile saklanır. Bu, "site ilk açıldığında" gereksinimini karşılar; UI'da görünür bir değişiklik yok.
@@ -58,12 +73,15 @@ Sayfa açılır → localStorage'da token yok → GET /api/token → token local
      ↓ (kullanıcı "Siparişi Onayla" / "Haber Ver" tıklar)
 sendToWebhook(payload) → POST /api/webhook  (Authorization: Bearer <token>)
      ↓
-api/webhook.js: jwt.verify → geçerli → WEBHOOK_URL'e forward → 200
-                            → geçersiz/401 → sendToWebhook yeni token alır → 1 kez retry
+api/webhook.js: rate limit kontrolü → aşıldı (>10/60sn, aynı IP) → 429
+                                    → aşılmadı ↓
+                jwt.verify → geçerli → WEBHOOK_URL'e forward → 200
+                           → geçersiz/401 → sendToWebhook yeni token alır → 1 kez retry
 ```
 
 ## Test Planı
 - `vercel dev` ile yerelde: `/api/token` çağrısının geçerli bir JWT döndürdüğü doğrulanır.
 - Token'sız / bozuk token ile `/api/webhook`'a istek atılıp `401` döndüğü doğrulanır.
 - Geçerli token ile istek atılıp mevcut davranışın (webhook.site'a forward, `200`) değişmediği doğrulanır.
+- Aynı IP'den 60 saniye içinde 11. istek atıldığında `429` döndüğü, 10. isteğe kadar (geçerli token ile) `200` alındığı doğrulanır.
 - Tarayıcıda uçtan uca: sayfa ilk açıldığında `localStorage`'da token oluştuğu, "Siparişi Onayla" ve "Haber Ver" akışlarının UI'da hiçbir görünür değişiklik olmadan çalışmaya devam ettiği doğrulanır.
