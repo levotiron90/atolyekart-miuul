@@ -95,3 +95,10 @@ const CARD_DATA = [
     ],
   },
 ];
+
+// api/ altındaki serverless fonksiyonlar (Node/CommonJS) bu dosyayı require
+// edebilsin diye — tarayıcıda <script src> ile yüklendiğinde `module` tanımsız
+// olduğu için bu blok atlanır, global CARD_DATA değişmeden kalır.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = CARD_DATA;
+}

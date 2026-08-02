@@ -651,6 +651,11 @@ function OrderForm({ product, variant, onSubmitted }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Çift gönderim koruması: setSending(true) sonrası buton disabled olur,
+    // ama React'in state güncellemesi bir sonraki render'a kadar DOM'a
+    // yansımayabilir (ör. Enter'a art arda basma). Bu senkron kontrol,
+    // aynı tık/tuş turunda ikinci bir gönderimi anında engeller.
+    if (sending) return;
     if (!emailRegex.test(email)) {
       alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
       return;
@@ -681,11 +686,11 @@ function OrderForm({ product, variant, onSubmitted }) {
     <form className="inline-form" onSubmit={handleSubmit}>
       <label className="form-field">
         <span>Ad Soyad</span>
-        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} />
+        <input type="text" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       <label className="form-field">
         <span>E-posta</span>
-        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="email" required maxLength={200} value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       <label className="form-field">
         <span>Telefon</span>
@@ -701,12 +706,12 @@ function OrderForm({ product, variant, onSubmitted }) {
               </option>
             ))}
           </select>
-          <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <input type="tel" required maxLength={30} value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
       </label>
       <label className="form-field form-field-quantity">
         <span>Adet</span>
-        <input type="number" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+        <input type="number" min="1" max="100" required value={quantity} onChange={(e) => setQuantity(e.target.value)} />
       </label>
       <div className="order-total">
         <span>Toplam Tutar</span>
@@ -743,6 +748,11 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Çift gönderim koruması: setSending(true) sonrası buton disabled olur,
+    // ama React'in state güncellemesi bir sonraki render'a kadar DOM'a
+    // yansımayabilir (ör. Enter'a art arda basma). Bu senkron kontrol,
+    // aynı tık/tuş turunda ikinci bir gönderimi anında engeller.
+    if (sending) return;
     if (!emailRegex.test(email)) {
       alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
       return;
@@ -771,11 +781,11 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
     <form className="inline-form" onSubmit={handleSubmit}>
       <label className="form-field">
         <span>Ad Soyad</span>
-        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} />
+        <input type="text" required maxLength={200} value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       <label className="form-field">
         <span>E-posta</span>
-        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="email" required maxLength={200} value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       <label className="consent-field">
         <input
