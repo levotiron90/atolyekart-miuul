@@ -393,6 +393,23 @@
   .form-submit-secondary {
     background: var(--accent);
   }
+  .consent-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .consent-field input[type="checkbox"] {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+    accent-color: var(--terracotta);
+  }
+  .consent-field a {
+    color: var(--terracotta);
+    text-decoration: underline;
+  }
   .form-success {
     margin: 0;
     background: var(--accent-soft);
@@ -423,6 +440,9 @@
     padding: 2.5rem 1.5rem 3rem;
     color: var(--muted);
     font-size: 0.85rem;
+  }
+  footer a {
+    color: var(--terracotta);
   }
   .footer-qr {
     display: flex;
@@ -566,6 +586,7 @@ function OrderForm({ product, variant, onSubmitted }) {
   const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0].code);
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
 
   const unitPrice = Number(variant.price.replace(/\D/g, "")) || 0;
@@ -575,6 +596,10 @@ function OrderForm({ product, variant, onSubmitted }) {
     e.preventDefault();
     if (!emailRegex.test(email)) {
       alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
+      return;
+    }
+    if (!consent) {
+      alert("Devam etmek için KVKK Aydınlatma Metni'ni kabul etmeniz gerekiyor.");
       return;
     }
     setSending(true);
@@ -627,7 +652,23 @@ function OrderForm({ product, variant, onSubmitted }) {
         <span>Toplam Tutar</span>
         <strong>₺{totalPrice}</strong>
       </div>
-      <button className="form-submit" type="submit" disabled={sending}>
+      <label className="consent-field">
+        <input
+          type="checkbox"
+          required
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+        />
+        <span>
+          Kişisel verilerimin siparişimin oluşturulması ve tarafımla iletişime
+          geçilmesi amacıyla işlenmesini{" "}
+          <a href="gizlilik-politikasi.html" target="_blank" rel="noopener noreferrer">
+            KVKK Aydınlatma Metni
+          </a>{" "}
+          kapsamında kabul ediyorum.
+        </span>
+      </label>
+      <button className="form-submit" type="submit" disabled={sending || !consent}>
         {sending ? "Gönderiliyor…" : "Siparişi Onayla"}
       </button>
     </form>
@@ -637,12 +678,17 @@ function OrderForm({ product, variant, onSubmitted }) {
 function StockNotifyForm({ product, variant, onSubmitted }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!emailRegex.test(email)) {
       alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
+      return;
+    }
+    if (!consent) {
+      alert("Devam etmek için KVKK Aydınlatma Metni'ni kabul etmeniz gerekiyor.");
       return;
     }
     setSending(true);
@@ -668,7 +714,23 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
         <span>E-posta</span>
         <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
-      <button className="form-submit form-submit-secondary" type="submit" disabled={sending}>
+      <label className="consent-field">
+        <input
+          type="checkbox"
+          required
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+        />
+        <span>
+          Kişisel verilerimin stok bildirimi talebimin değerlendirilmesi
+          amacıyla işlenmesini{" "}
+          <a href="gizlilik-politikasi.html" target="_blank" rel="noopener noreferrer">
+            KVKK Aydınlatma Metni
+          </a>{" "}
+          kapsamında kabul ediyorum.
+        </span>
+      </label>
+      <button className="form-submit form-submit-secondary" type="submit" disabled={sending || !consent}>
         {sending ? "Gönderiliyor…" : "Haber Ver"}
       </button>
     </form>
@@ -819,6 +881,10 @@ function App() {
       <footer>
         <SiteQRCode />
         &copy; 2026 Lather &amp; Lull — Doğal &amp; Sürdürülebilir Bakım
+        <br />
+        <a href="gizlilik-politikasi.html" target="_blank" rel="noopener noreferrer">
+          KVKK Aydınlatma Metni
+        </a>
       </footer>
     </React.Fragment>
   );

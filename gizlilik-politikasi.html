@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KVKK Aydınlatma Metni — Lather & Lull</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f9f1e9;
+    --surface: #fffdfb;
+    --text: #33281f;
+    --muted: #83705f;
+    --accent: #7f9873;
+    --accent-soft: #e9edda;
+    --terracotta: #bf6f47;
+    --terracotta-soft: #f3ded0;
+    --border: #ecdece;
+    --shadow: rgba(59, 41, 24, 0.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #221c17;
+      --surface: #2b241d;
+      --text: #f2e9de;
+      --muted: #b7a795;
+      --accent: #9db28e;
+      --accent-soft: #333a2b;
+      --terracotta: #e0916a;
+      --terracotta-soft: #43302a;
+      --border: #423a30;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  h1, h2, .brand-word {
+    font-family: "Fraunces", Georgia, serif;
+  }
+  .topbar {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1.5rem 0;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    text-decoration: none;
+  }
+  .logo svg { display: block; }
+  .logo .brand-word {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--text);
+  }
+  .logo .brand-word em {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  .category-label {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: var(--terracotta);
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+  }
+  .page-header h1 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    font-weight: 600;
+  }
+  .updated-note {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .policy-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem 2.25rem;
+    box-shadow: 0 14px 30px -14px var(--shadow);
+  }
+  .policy-card section + section {
+    margin-top: 1.9rem;
+    padding-top: 1.9rem;
+    border-top: 1px solid var(--border);
+  }
+  .policy-card h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .policy-card p {
+    margin: 0 0 0.75rem;
+    color: var(--text);
+  }
+  .policy-card ul {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+  }
+  .policy-card li {
+    margin-bottom: 0.4rem;
+  }
+  .policy-card p:last-child,
+  .policy-card ul:last-child {
+    margin-bottom: 0;
+  }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 0.75rem;
+  }
+  table.data-table th,
+  table.data-table td {
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data-table th {
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+  }
+  .contact-box {
+    background: var(--terracotta-soft);
+    border-radius: 14px;
+    padding: 1.1rem 1.3rem;
+    font-size: 0.92rem;
+  }
+  .contact-box a {
+    color: var(--text);
+    font-weight: 600;
+  }
+  a {
+    color: var(--terracotta);
+  }
+  .back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  footer {
+    text-align: center;
+    padding: 1.5rem 1.5rem 3rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="react.html">
+    <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <path d="M24 19 L24 45 L37 45" stroke="var(--accent)" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M41 20 C48 26 48 30 41 36 C34 42 34 46 41 46" stroke="var(--terracotta)" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span class="brand-word">Lather <em>&amp;</em> Lull</span>
+  </a>
+</div>
+
+<main>
+  <div class="page-header">
+    <div class="category-label">Kişisel Verilerin Korunması</div>
+    <h1>KVKK Aydınlatma Metni</h1>
+    <p class="updated-note">Son güncelleme: 2 Ağustos 2026</p>
+  </div>
+
+  <div class="policy-card">
+
+    <section>
+      <h2>1. Veri Sorumlusu</h2>
+      <p>
+        6698 sayılı Kişisel Verilerin Korunması Kanunu ("<strong>KVKK</strong>") uyarınca, bu internet
+        sitesi (AtölyeKart / "Lather &amp; Lull" katalog uygulaması) üzerinden paylaştığınız kişisel
+        verileriniz, veri sorumlusu sıfatıyla <strong>Lather &amp; Lull</strong> tarafından aşağıda
+        açıklanan kapsamda işlenmektedir.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Hangi Kişisel Veriler Toplanır?</h2>
+      <p>Sitede yalnızca aşağıdaki iki form aracılığıyla, sizin doğrudan girdiğiniz veriler toplanır. Otomatik olarak çerez, konum veya cihaz parmak izi gibi izleme verisi toplanmaz.</p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Form / Eylem</th>
+            <th>Toplanan Veriler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag">Sipariş Ver</span></td>
+            <td>Ad soyad, e-posta adresi, telefon numarası, sipariş edilen ürün/çeşit ve adet bilgisi</td>
+          </tr>
+          <tr>
+            <td><span class="tag">Stok Bildirimi İste</span></td>
+            <td>Ad soyad, e-posta adresi, talep edilen ürün/çeşit bilgisi</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>3. İşleme Amaçları</h2>
+      <ul>
+        <li>Sipariş talebinizin oluşturulması, onaylanması ve sizinle iletişime geçilerek teslimat sürecinin yürütülmesi,</li>
+        <li>Stok bildirimi talep ettiğiniz ürün/çeşit tekrar stoğa girdiğinde tarafınıza haber verilmesi,</li>
+        <li>Talebinizle ilgili sizinle iletişim kurulması ve olası soru/itirazların yanıtlanması,</li>
+        <li>Yasal yükümlülüklerin (ör. fatura/ticari kayıt) yerine getirilmesi.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. Hukuki Sebep</h2>
+      <p>Kişisel verileriniz, KVKK m.5/2(c) kapsamında bir sözleşmenin kurulması veya ifasıyla doğrudan
+        doğruya ilgili olması (sipariş süreci) ve KVKK m.5/1 kapsamında açık rızanız (stok bildirimi
+        talebi ve iletişim) hukuki sebeplerine dayanılarak işlenmektedir. Formu göndermeden önce
+        işaretlediğiniz onay kutusu, bu açık rızanızın alınmasını sağlar.</p>
+    </section>
+
+    <section>
+      <h2>5. Saklama Süresi</h2>
+      <ul>
+        <li><strong>Sipariş verileri:</strong> Türk Ticaret Kanunu ve Vergi Usul Kanunu'ndaki saklama
+          yükümlülükleri gereği azami <strong>10 yıl</strong> süreyle saklanır.</li>
+        <li><strong>Stok bildirimi talepleri:</strong> İlgili ürün/çeşit stoğa girip bildirim
+          gönderilene veya talep tarihinden itibaren <strong>1 yıl</strong> geçene kadar (hangisi önce
+          gerçekleşirse) saklanır; süre sonunda silinir veya anonim hale getirilir.</li>
+      </ul>
+      <p>Saklama süresinin sona ermesinin ardından verileriniz KVKK'ya uygun şekilde silinir, yok edilir
+        veya anonim hale getirilir.</p>
+    </section>
+
+    <section>
+      <h2>6. Verilerin Aktarıldığı Üçüncü Taraflar</h2>
+      <p>Form gönderiminde girdiğiniz veriler, siparişin/talebin işleme alınabilmesi için aşağıdaki
+        hizmet sağlayıcılar aracılığıyla işlenir. Bu sağlayıcılar veri işleyen sıfatıyla hareket eder;
+        veriler kendi ticari amaçları için kullanılmaz.</p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Taraf</th>
+            <th>Rolü</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Vercel Inc.</strong></td>
+            <td>Sitenin barındırıldığı ve form isteklerinin geçtiği sunucusuz (serverless) altyapı
+              sağlayıcısı. Vercel'in altyapısı yurt dışında (başta ABD) konumlanabildiğinden, form
+              verileriniz bu aktarım sırasında yurt dışına aktarılabilir.</td>
+          </tr>
+          <tr>
+            <td><strong>n8n (otomasyon iş akışı)</strong></td>
+            <td>Sipariş ve stok bildirimi taleplerinin atölye sahibine iletilmesini sağlayan
+              otomasyon/entegrasyon aracı.</td>
+          </tr>
+          <tr>
+            <td><strong>Webhook uç noktası</strong></td>
+            <td>Sipariş/talep verilerinin nihai olarak ulaştığı, atölye tarafından yönetilen bildirim
+              hedefi (ör. e-posta, sohbet kanalı veya sipariş takip aracı).</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Yurt dışına veri aktarımı, KVKK m.9 kapsamında açık rızanıza veya Kurul tarafından yeterli
+        korumaya sahip olduğu ilan edilen ülke/aktarım garanti mekanizmalarına dayanılarak
+        gerçekleştirilir.</p>
+    </section>
+
+    <section>
+      <h2>7. Çerezler</h2>
+      <p>Bu site, form gönderimi dışında herhangi bir analitik, reklam veya izleme çerezi
+        kullanmamaktadır.</p>
+    </section>
+
+    <section>
+      <h2>8. KVKK m.11 Kapsamındaki Haklarınız</h2>
+      <p>KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:</p>
+      <ul>
+        <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme,</li>
+        <li>İşlenmişse buna ilişkin bilgi talep etme,</li>
+        <li>İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme,</li>
+        <li>Yurt içinde/yurt dışında aktarıldığı üçüncü kişileri bilme,</li>
+        <li>Eksik/yanlış işlenmişse düzeltilmesini isteme,</li>
+        <li>İşlenmesini gerektiren sebepler ortadan kalktığında silinmesini veya yok edilmesini isteme,</li>
+        <li>Düzeltme/silme işlemlerinin aktarıldığı üçüncü kişilere bildirilmesini isteme,</li>
+        <li>Otomatik sistemlerce yapılan analiz sonucu aleyhinize bir sonucun ortaya çıkmasına itiraz etme,</li>
+        <li>Kanuna aykırı işlenme nedeniyle uğradığınız zararın giderilmesini talep etme.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>9. Başvuru ve Silme Talebi Yolu</h2>
+      <p>Yukarıdaki haklarınızı kullanmak, verilerinizin silinmesini talep etmek veya işleme konusunda
+        sorularınızı iletmek için aşağıdaki iletişim kanalından bize ulaşabilirsiniz. Başvurunuz, kimlik
+        doğrulamasının ardından KVKK'da öngörülen süre içinde (en geç 30 gün) sonuçlandırılır.</p>
+      <div class="contact-box">
+        <strong>İletişim:</strong> <a href="mailto:info@latherandlull.com">info@latherandlull.com</a>
+        <p style="margin: 0.4rem 0 0; font-size: 0.82rem; color: var(--muted);">
+          (Yer tutucu iletişim adresi — atölyenin gerçek KVKK başvuru e-postası ile güncellenmelidir.)
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <a class="back-link" href="react.html">&larr; Kataloğa geri dön</a>
+</main>
+
+<footer>
+  &copy; 2026 Lather &amp; Lull — Doğal &amp; Sürdürülebilir Bakım
+</footer>
+
+</body>
+</html>
