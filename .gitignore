@@ -4,3 +4,4 @@
 .vercel
 .env*
 .superpowers/
+node_modules/
