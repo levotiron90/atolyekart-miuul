@@ -515,6 +515,16 @@ const COUNTRY_CODES = [
   { flag: "🇬🇧", code: "+44", label: "İngiltere" },
 ];
 
+async function fetchAuthToken() {
+  const res = await fetch("/api/token");
+  if (!res.ok) {
+    throw new Error(`Token alınamadı: ${res.status}`);
+  }
+  const data = await res.json();
+  localStorage.setItem("atolyekart_jwt", data.token);
+  return data.token;
+}
+
 async function sendToWebhook(payload) {
   try {
     // Gerçek webhook adresi tarayıcıya hiç gönderilmez: istek aynı origin'deki
@@ -867,6 +877,12 @@ function SiteQRCode() {
 }
 
 function App() {
+  useEffect(() => {
+    if (!localStorage.getItem("atolyekart_jwt")) {
+      fetchAuthToken().catch((err) => console.warn("Token alınamadı:", err));
+    }
+  }, []);
+
   return (
     <React.Fragment>
       <Hero />
