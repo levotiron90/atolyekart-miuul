@@ -401,6 +401,23 @@
     border-radius: 10px;
     font-size: 0.88rem;
   }
+  .order-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    background: var(--terracotta-soft);
+    color: var(--text);
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .order-total strong {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--price-badge);
+  }
   footer {
     text-align: center;
     padding: 2.5rem 1.5rem 3rem;
@@ -557,6 +574,9 @@ function OrderForm({ product, variant, onSubmitted }) {
   const [quantity, setQuantity] = useState(1);
   const [sending, setSending] = useState(false);
 
+  const unitPrice = Number(variant.price.replace(/\D/g, "")) || 0;
+  const totalPrice = unitPrice * (Number(quantity) || 0);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!emailRegex.test(email)) {
@@ -609,6 +629,10 @@ function OrderForm({ product, variant, onSubmitted }) {
         <span>Adet</span>
         <input type="number" min="1" required value={quantity} onChange={(e) => setQuantity(e.target.value)} />
       </label>
+      <div className="order-total">
+        <span>Toplam Tutar</span>
+        <strong>₺{totalPrice}</strong>
+      </div>
       <button className="form-submit" type="submit" disabled={sending}>
         {sending ? "Gönderiliyor…" : "Siparişi Onayla"}
       </button>
