@@ -1,40 +1,16 @@
 const jwt = require("jsonwebtoken");
-
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const RATE_LIMIT_MAX_REQUESTS = 10;
-const requestLog = new Map();
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = requestLog.get(ip);
-
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    requestLog.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-
-  entry.count += 1;
-  return entry.count > RATE_LIMIT_MAX_REQUESTS;
-}
-
-function getClientIp(req) {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-  return req.socket?.remoteAddress || "unknown";
-}
+const { isRateLimited, getClientIp } = require("./_rateLimit");
 
 module.exports = async (req, res) => {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
-
   const ip = getClientIp(req);
   if (isRateLimited(ip)) {
     res.setHeader("Retry-After", "60");
     return res.status(429).json({ error: "Too Many Requests" });
+  }
+
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   const authHeader = req.headers["authorization"] || "";
@@ -44,9 +20,16 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error("JWT_SECRET ortam değişkeni tanımlı değil");
+    return res.status(500).json({ error: "Auth service not configured" });
+  }
+
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
+    jwt.verify(token, secret, { algorithms: ["HS256"] });
   } catch (err) {
+    console.warn("JWT doğrulama başarısız:", err.message);
     return res.status(401).json({ error: "Unauthorized" });
   }
 

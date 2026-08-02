@@ -418,6 +418,14 @@
     border-radius: 10px;
     font-size: 0.88rem;
   }
+  .form-error {
+    margin: 0;
+    background: var(--terracotta-soft);
+    color: var(--text);
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+  }
   .order-total {
     display: flex;
     align-items: baseline;
@@ -521,20 +529,33 @@ async function fetchAuthToken() {
     throw new Error(`Token alınamadı: ${res.status}`);
   }
   const data = await res.json();
-  localStorage.setItem("atolyekart_jwt", data.token);
+  try {
+    localStorage.setItem("atolyekart_jwt", data.token);
+  } catch (err) {
+    console.warn("localStorage'a token yazılamadı:", err);
+  }
   return data.token;
 }
 
 async function sendToWebhook(payload) {
+  // Gerçek webhook adresi tarayıcıya hiç gönderilmez: istek aynı origin'deki
+  // /api/webhook serverless fonksiyonuna gider, o da process.env.WEBHOOK_URL'i
+  // sunucu tarafında okuyup hedefe iletir. Aynı origin olduğu için CORS sorunu
+  // yaşanmaz, normal application/json isteği yeterlidir.
+  // /api/webhook ayrıca Authorization: Bearer <JWT> header'ını zorunlu kılar
+  // (anonim, oturum bazlı token — bkz. fetchAuthToken). Token süresi dolmuşsa
+  // (401) yeni bir token alınıp istek bir kez daha denenir.
+  // Dönüş değeri true/false: çağıran bileşen (OrderForm/StockNotifyForm) buna
+  // göre kullanıcıya başarı ya da hata mesajı gösterir — istek gerçekten
+  // teslim edilmediyse (ör. 429, ağ hatası) artık sessizce "başarılı" denmez.
+  let success = false;
   try {
-    // Gerçek webhook adresi tarayıcıya hiç gönderilmez: istek aynı origin'deki
-    // /api/webhook serverless fonksiyonuna gider, o da process.env.WEBHOOK_URL'i
-    // sunucu tarafında okuyup hedefe iletir. Aynı origin olduğu için CORS sorunu
-    // yaşanmaz, normal application/json isteği yeterlidir.
-    // /api/webhook ayrıca Authorization: Bearer <JWT> header'ını zorunlu kılar
-    // (anonim, oturum bazlı token — bkz. fetchAuthToken). Token süresi dolmuşsa
-    // (401) yeni bir token alınıp istek bir kez daha denenir.
-    let token = localStorage.getItem("atolyekart_jwt");
+    let token = null;
+    try {
+      token = localStorage.getItem("atolyekart_jwt");
+    } catch (err) {
+      console.warn("localStorage okunamadı:", err);
+    }
     let response = await fetch("/api/webhook", {
       method: "POST",
       headers: {
@@ -558,11 +579,14 @@ async function sendToWebhook(payload) {
 
     if (!response.ok) {
       console.warn("Webhook isteği başarısız:", response.status);
+    } else {
+      success = true;
     }
   } catch (err) {
     console.warn("Webhook'a ulaşılamadı:", err);
   }
   console.log("Webhook payload:", payload);
+  return success;
 }
 
 const TRUST_ITEMS = [
@@ -636,7 +660,7 @@ function OrderForm({ product, variant, onSubmitted }) {
       return;
     }
     setSending(true);
-    await sendToWebhook({
+    const success = await sendToWebhook({
       event: "order.created",
       name,
       productId: getProductId(product.name, variant.name),
@@ -645,9 +669,12 @@ function OrderForm({ product, variant, onSubmitted }) {
       email,
       quantity: Number(quantity),
       source: "atolyekart-web",
+      kvkkConsent: consent,
+      consentAt: new Date().toISOString(),
+      policyVersion: "2026-08-02",
     });
     setSending(false);
-    onSubmitted();
+    onSubmitted(success);
   };
 
   return (
@@ -725,16 +752,19 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
       return;
     }
     setSending(true);
-    await sendToWebhook({
+    const success = await sendToWebhook({
       event: "stock_notification.requested",
       name,
       productId: getProductId(product.name, variant.name),
       productName: `${product.name} — ${variant.name}`,
       email,
       source: "atolyekart-web",
+      kvkkConsent: consent,
+      consentAt: new Date().toISOString(),
+      policyVersion: "2026-08-02",
     });
     setSending(false);
-    onSubmitted();
+    onSubmitted(success);
   };
 
   return (
@@ -773,14 +803,14 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
 function ProductCard({ product }) {
   const [variantIndex, setVariantIndex] = useState(0);
   const [actionOpen, setActionOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // null | "success" | "error"
   const variant = product.variants[variantIndex];
   const productId = getProductId(product.name, variant.name);
   const inStock = STOCK[productId] !== false;
 
   useEffect(() => {
     setActionOpen(false);
-    setSubmitted(false);
+    setSubmitStatus(null);
   }, [variantIndex]);
 
   return (
@@ -815,17 +845,21 @@ function ProductCard({ product }) {
         </div>
         <p className="description">{variant.description}</p>
 
-        {submitted ? (
+        {submitStatus === "success" ? (
           <p className="form-success">
             {inStock
               ? "Siparişiniz alındı, teşekkürler! En kısa sürede sizinle iletişime geçeceğiz."
               : "Talebiniz alındı — ürün stoğa girdiğinde size haber vereceğiz."}
           </p>
+        ) : submitStatus === "error" ? (
+          <p className="form-error">
+            Şu anda yoğunluk var, isteğiniz iletilemedi. Lütfen bir dakika sonra tekrar deneyin.
+          </p>
         ) : actionOpen ? (
           inStock ? (
-            <OrderForm product={product} variant={variant} onSubmitted={() => setSubmitted(true)} />
+            <OrderForm product={product} variant={variant} onSubmitted={(success) => setSubmitStatus(success ? "success" : "error")} />
           ) : (
-            <StockNotifyForm product={product} variant={variant} onSubmitted={() => setSubmitted(true)} />
+            <StockNotifyForm product={product} variant={variant} onSubmitted={(success) => setSubmitStatus(success ? "success" : "error")} />
           )
         ) : (
           <button
@@ -901,7 +935,13 @@ function SiteQRCode() {
 
 function App() {
   useEffect(() => {
-    if (!localStorage.getItem("atolyekart_jwt")) {
+    let existingToken = null;
+    try {
+      existingToken = localStorage.getItem("atolyekart_jwt");
+    } catch (err) {
+      console.warn("localStorage okunamadı:", err);
+    }
+    if (!existingToken) {
       fetchAuthToken().catch((err) => console.warn("Token alınamadı:", err));
     }
   }, []);
