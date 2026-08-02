@@ -6,3 +6,4 @@
 .superpowers/
 node_modules/
 *.log
+*.err
