@@ -357,6 +357,24 @@
   .form-field-quantity input {
     width: 5rem;
   }
+  .phone-field {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .country-code-select {
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 0.4rem;
+    flex: 0 0 auto;
+  }
+  .phone-field input {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
   .form-submit {
     border: none;
     background: var(--terracotta);
@@ -455,6 +473,15 @@ function getProductId(productName, variantName) {
   return `${slugify(productName)}_${slugify(variantName)}`;
 }
 
+const emailRegex = /^(?=.*@)(?=.*\.com).+$/i;
+
+const COUNTRY_CODES = [
+  { flag: "🇹🇷", code: "+90", label: "Türkiye" },
+  { flag: "🇺🇸", code: "+1", label: "ABD" },
+  { flag: "🇩🇪", code: "+49", label: "Almanya" },
+  { flag: "🇬🇧", code: "+44", label: "İngiltere" },
+];
+
 async function sendToWebhook(payload) {
   try {
     // mode: "no-cors" + text/plain: çoğu webhook hedefi (webhook.site dahil,
@@ -525,19 +552,24 @@ function ProductImage({ imageUrl, alt }) {
 function OrderForm({ product, variant, onSubmitted }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [countryCode, setCountryCode] = useState(COUNTRY_CODES[0].code);
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailRegex.test(email)) {
+      alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
+      return;
+    }
     setSending(true);
     await sendToWebhook({
       event: "order.created",
       name,
       productId: getProductId(product.name, variant.name),
       productName: `${product.name} — ${variant.name}`,
-      phone,
+      phone: `${countryCode} ${phone}`,
       email,
       quantity: Number(quantity),
       source: "atolyekart-web",
@@ -558,7 +590,20 @@ function OrderForm({ product, variant, onSubmitted }) {
       </label>
       <label className="form-field">
         <span>Telefon</span>
-        <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <div className="phone-field">
+          <select
+            className="country-code-select"
+            value={countryCode}
+            onChange={(e) => setCountryCode(e.target.value)}
+          >
+            {COUNTRY_CODES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.flag} {c.code}
+              </option>
+            ))}
+          </select>
+          <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </div>
       </label>
       <label className="form-field form-field-quantity">
         <span>Adet</span>
@@ -578,6 +623,10 @@ function StockNotifyForm({ product, variant, onSubmitted }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailRegex.test(email)) {
+      alert("Lütfen geçerli bir e-posta adresi girin (örn. ad@ornek.com).");
+      return;
+    }
     setSending(true);
     await sendToWebhook({
       event: "stock_notification.requested",
