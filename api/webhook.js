@@ -20,8 +20,7 @@ function getClientIp(req) {
   if (forwarded) {
     return forwarded.split(",")[0].trim();
   }
-  // Try multiple ways to get the client IP
-  return req.socket?.remoteAddress || req.connection?.remoteAddress || req.ip || "127.0.0.1";
+  return req.socket?.remoteAddress || "unknown";
 }
 
 module.exports = async (req, res) => {
