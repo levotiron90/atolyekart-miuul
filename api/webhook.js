@@ -3,6 +3,7 @@ const { isRateLimited, getClientIp } = require("./_rateLimit");
 const { isValidProductId } = require("./_catalog");
 
 const ALLOWED_EVENTS = new Set(["order.created", "stock_notification.requested"]);
+const ALLOWED_SOURCES = new Set(["atolyekart-web", "atolyekart-mobile"]);
 const MAX_TEXT_LENGTH = 200;
 const MAX_PHONE_LENGTH = 30;
 const MAX_QUANTITY = 100;
@@ -24,7 +25,7 @@ function buildValidatedPayload(body) {
   if (!isBoundedString(body.email, MAX_TEXT_LENGTH)) return null;
   if (!isValidProductId(body.productId)) return null;
   if (!isBoundedString(body.productName, MAX_TEXT_LENGTH)) return null;
-  if (body.source !== "atolyekart-web") return null;
+  if (!ALLOWED_SOURCES.has(body.source)) return null;
   if (body.kvkkConsent !== true) return null;
 
   const payload = {
@@ -33,7 +34,7 @@ function buildValidatedPayload(body) {
     productId: body.productId,
     productName: body.productName.trim(),
     email: body.email.trim(),
-    source: "atolyekart-web",
+    source: body.source,
     kvkkConsent: true,
     consentAt: new Date().toISOString(),
     policyVersion: POLICY_VERSION,
