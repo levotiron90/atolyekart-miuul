@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "AtölyeKart",
+    "slug": "atolyekart-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSContactsUsageDescription": "Sipariş formunu rehberinizden bir kişi seçerek hızlıca doldurabilmeniz için kişilerinize erişim izni istiyoruz."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": ["android.permission.READ_CONTACTS"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Sipariş formunu rehberinizden bir kişi seçerek hızlıca doldurabilmeniz için kişilerinize erişim izni istiyoruz."
+        }
+      ]
+    ]
+  }
+}
