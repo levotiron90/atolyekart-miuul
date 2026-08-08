@@ -2,6 +2,7 @@
   "expo": {
     "name": "AtölyeKart",
     "slug": "atolyekart-mobile",
+    "owner": "levotiron90",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,13 +14,17 @@
       }
     },
     "android": {
+      "package": "com.levotiron90.atolyekartmobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "permissions": ["android.permission.READ_CONTACTS"]
+      "permissions": [
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -31,6 +36,11 @@
           "contactsPermission": "Sipariş formunu rehberinizden bir kişi seçerek hızlıca doldurabilmeniz için kişilerinize erişim izni istiyoruz."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "23a851cd-17c7-40b4-b01b-1dd39cb5c399"
+      }
+    }
   }
 }
