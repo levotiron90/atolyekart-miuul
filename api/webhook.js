@@ -53,6 +53,8 @@ function buildValidatedPayload(body) {
 }
 
 module.exports = async (req, res) => {
+  console.log("KULLANILAN WEBHOOK ADRESI:", process.env.WEBHOOK_URL);
+
   const ip = getClientIp(req);
   if (isRateLimited(ip)) {
     res.setHeader("Retry-After", "60");
@@ -96,14 +98,29 @@ module.exports = async (req, res) => {
   }
 
   try {
-    await fetch(webhookUrl, {
+    const webhookRes = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
+    if (!webhookRes.ok) {
+      const responseText = await webhookRes.text().catch(() => "");
+      console.error(
+        "Webhook hedefi hata döndü:",
+        webhookRes.status,
+        webhookRes.statusText,
+        responseText
+      );
+      return res.status(500).json({
+        error: "Webhook delivery failed",
+        detail: `Hedef ${webhookRes.status} ${webhookRes.statusText} döndü: ${responseText}`,
+      });
+    }
+
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error("Webhook'a ulaşılamadı:", err);
-    return res.status(502).json({ error: "Webhook delivery failed" });
+    return res.status(500).json({ error: "Webhook delivery failed", detail: err.message });
   }
 };
