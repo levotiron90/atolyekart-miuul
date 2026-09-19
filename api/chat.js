@@ -1,5 +1,3 @@
-const { isRateLimited, getClientIp } = require("./_rateLimit");
-
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_SESSION_ID_LENGTH = 100;
 
@@ -8,12 +6,6 @@ function isBoundedString(value, maxLength) {
 }
 
 module.exports = async (req, res) => {
-  const ip = getClientIp(req);
-  if (isRateLimited(ip)) {
-    res.setHeader("Retry-After", "60");
-    return res.status(429).json({ error: "Too Many Requests" });
-  }
-
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method Not Allowed" });
